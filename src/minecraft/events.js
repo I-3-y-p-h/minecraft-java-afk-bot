@@ -10,9 +10,15 @@ let initialized = false;
             return;
         }
         await sleep(3000);
+        if(!bot.player){
+            return;
+        }
         bot.chat(`/switch ${process.env.CB}`);
         initialized = true;
         await sleep(10000);
+        if(!bot.player){
+            return;
+        }
         bot.chat("/p h");
     });
     bot.on("chat", (username,message) =>{
@@ -20,6 +26,7 @@ let initialized = false;
     });
     bot.on("kicked", (reason) => {
         console.log("Bot has been kicked:", reason);
+
     });
 
     bot.on("error", (error) => {
