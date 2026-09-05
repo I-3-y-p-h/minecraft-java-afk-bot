@@ -72,7 +72,39 @@ async function sendKickMessage(reason) {
         }
 
         await channel.send(
-            `Bot has been kicked: ${reason}`
+            `Bot has been kicked: ${reason.value.text.value}`
+        );
+
+    } catch (error) {
+        console.error("Could not send kick message:", error);
+    }
+}
+async function sendKickMessage(reason) {
+
+    try {
+
+        const channel = await client.channels.fetch(
+            process.env.DISCORD_CHANNEL_ID_KICKED
+        );
+
+        if (!channel) {
+            console.error("Kick channel not found.");
+            return;
+        }
+
+        let message = "Unknown reason";
+
+        if (
+            reason &&
+            reason.value &&
+            reason.value.text &&
+            reason.value.text.value
+        ) {
+            message = reason.value.text.value;
+        }
+
+        await channel.send(
+            `Bot has been kicked:\n${message}`
         );
 
     } catch (error) {
@@ -80,8 +112,33 @@ async function sendKickMessage(reason) {
     }
 }
 
+
+async function sendReconnectingMessage() {
+
+    try {
+
+        const channel = await client.channels.fetch(
+            process.env.DISCORD_CHANNEL_ID_RECONNECT
+        );
+
+        if (!channel) {
+            console.error("Reconnect channel not found.");
+            return;
+        }
+
+        await channel.send(
+            `Minecraft-Bot is reconnecting...`
+        );
+
+    } catch (error) {
+        console.error("Could not send reconnect message:", error);
+    }
+}
+
+
 module.exports = {
     client,
     startDiscordBot,
-    sendKickMessage
+    sendKickMessage,
+    sendReconnectingMessage
 };

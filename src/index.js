@@ -6,11 +6,13 @@ const {
 
 const {
     startDiscordBot,
-    sendKickMessage
+    sendKickMessage,
+    sendReconnectingMessage
 } = require("./discord/client");
 
 connect({
-    onKicked: sendKickMessage
+    onKicked: sendKickMessage,
+    onReconnecting: sendReconnectingMessage
 });
 
 startDiscordBot();

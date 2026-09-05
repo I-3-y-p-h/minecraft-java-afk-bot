@@ -3,6 +3,9 @@ const { registerMinecraftEvents } = require("./events");
 
 let bot = null;
 
+let autoReconnect = true;
+let manualDisconnect = false;
+
 function connect(callbacks = {}) {
 
     if (bot) {
@@ -12,13 +15,37 @@ function connect(callbacks = {}) {
 
     console.log("Connecting...");
 
+    manualDisconnect = false;
+
     bot = createMinecraftBot();
 
     registerMinecraftEvents(bot, callbacks);
 
     bot.on("end", () => {
+
         console.log("Disconnected!");
+
         bot = null;
+
+        if (manualDisconnect) {
+            console.log("Disconnect was manual. No reconnect.");
+            return;
+        }
+
+        if (!autoReconnect) {
+            console.log("Auto-Reconnect is disabled.");
+            return;
+        }
+
+        console.log("Reconnecting in 5 seconds...");
+
+        if (callbacks.onReconnecting) {
+            callbacks.onReconnecting();
+        }
+
+        setTimeout(() => {
+            connect(callbacks);
+        }, Number(process.env.RECONNECT_DELAY) || 5000);
     });
 
     return bot;
@@ -32,6 +59,8 @@ function disconnect() {
     }
 
     console.log("Disconnecting...");
+
+    manualDisconnect = true;
 
     bot.quit();
     bot = null;
