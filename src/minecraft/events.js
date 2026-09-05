@@ -1,14 +1,22 @@
-function registerMinecraftEvents(bot) {
+function registerMinecraftEvents(bot, callbacks = {}) {
 
     let initialized = false;
 
     bot.on("login", () => {
         console.log("Login");
+
+        if (callbacks.onLogin) {
+            callbacks.onLogin();
+        }
     });
 
     bot.on("spawn", async () => {
 
         console.log("Bot spawned!");
+
+        if (callbacks.onSpawn) {
+            callbacks.onSpawn();
+        }
 
         if (initialized) {
             return;
@@ -38,7 +46,12 @@ function registerMinecraftEvents(bot) {
     });
 
     bot.on("kicked", (reason) => {
+
         console.log("Bot has been kicked:", reason);
+
+        if (callbacks.onKicked) {
+            callbacks.onKicked(reason);
+        }
     });
 
     bot.on("error", (error) => {

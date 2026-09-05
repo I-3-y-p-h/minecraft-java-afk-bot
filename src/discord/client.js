@@ -44,9 +44,13 @@ function startDiscordBot() {
             console.error(error);
 
             if (interaction.replied || interaction.deferred) {
-                await interaction.followUp("Error while trying to execute command.");
+                await interaction.followUp(
+                    "Error while executing command."
+                );
             } else {
-                await interaction.reply("Error while trying to execute command.");
+                await interaction.reply(
+                    "Error while executing command."
+                );
             }
         }
     });
@@ -54,7 +58,30 @@ function startDiscordBot() {
     client.login(process.env.DISCORD_TOKEN);
 }
 
+async function sendKickMessage(reason) {
+
+    try {
+
+        const channel = await client.channels.fetch(
+            process.env.DISCORD_CHANNEL_ID_KICKED
+        );
+
+        if (!channel) {
+            console.error("Kick channel not found.");
+            return;
+        }
+
+        await channel.send(
+            `Bot has been kicked: ${reason}`
+        );
+
+    } catch (error) {
+        console.error("Could not send kick message:", error);
+    }
+}
+
 module.exports = {
     client,
-    startDiscordBot
+    startDiscordBot,
+    sendKickMessage
 };

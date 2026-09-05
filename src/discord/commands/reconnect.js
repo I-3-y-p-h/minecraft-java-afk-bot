@@ -8,8 +8,15 @@ module.exports = {
 
     async execute(interaction) {
 
-        reconnect();
+        const message = await interaction.reply({
+            content: "Bot is reconnecting...",
+            fetchReply: true
+        });
 
-        await interaction.reply("Bot is reconnecting...");
+        reconnect({
+            onSpawn: async () => {
+                await message.edit("Bot has reconnected!");
+            }
+        });
     }
 };

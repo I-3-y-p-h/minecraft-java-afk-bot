@@ -3,7 +3,8 @@ const { registerMinecraftEvents } = require("./events");
 
 let bot = null;
 
-function connect() {
+function connect(callbacks = {}) {
+
     if (bot) {
         console.log("Bot is already connected.");
         return bot;
@@ -13,7 +14,7 @@ function connect() {
 
     bot = createMinecraftBot();
 
-    registerMinecraftEvents(bot);
+    registerMinecraftEvents(bot, callbacks);
 
     bot.on("end", () => {
         console.log("Disconnected!");
@@ -24,6 +25,7 @@ function connect() {
 }
 
 function disconnect() {
+
     if (!bot) {
         console.log("Bot is already disconnected.");
         return;
@@ -35,13 +37,14 @@ function disconnect() {
     bot = null;
 }
 
-function reconnect() {
+function reconnect(callbacks = {}) {
+
     console.log("Reconnecting...");
 
     disconnect();
 
     setTimeout(() => {
-        connect();
+        connect(callbacks);
     }, 2000);
 }
 

@@ -1,7 +1,16 @@
 require("dotenv").config();
 
-const { connect } = require("./minecraft/manager");
-const { startDiscordBot } = require("./discord/client");
+const {
+    connect
+} = require("./minecraft/manager");
 
-connect();
+const {
+    startDiscordBot,
+    sendKickMessage
+} = require("./discord/client");
+
+connect({
+    onKicked: sendKickMessage
+});
+
 startDiscordBot();
