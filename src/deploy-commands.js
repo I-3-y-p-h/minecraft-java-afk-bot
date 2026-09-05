@@ -5,11 +5,13 @@ const { REST, Routes } = require("discord.js");
 const say = require("./discord/commands/say");
 const stop = require("./discord/commands/stop");
 const reconnect = require("./discord/commands/reconnect");
+const autoreconnect = require("./discord/commands/autoreconnect");
 
 const commands = [
     say.data.toJSON(),
     stop.data.toJSON(),
-    reconnect.data.toJSON()
+    reconnect.data.toJSON(),
+    autoreconnect.data.toJSON()
 ];
 
 const rest = new REST({ version: "10" }).setToken(

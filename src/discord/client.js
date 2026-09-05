@@ -7,6 +7,7 @@ const { setDiscordClient } = require("./status");
 const say = require("./commands/say");
 const stop = require("./commands/stop");
 const reconnect = require("./commands/reconnect");
+const autoreconnect = require("./commands/autoreconnect");
 
 const client = new Client({
     intents: [
@@ -19,6 +20,7 @@ client.commands = new Collection();
 client.commands.set(say.data.name, say);
 client.commands.set(stop.data.name, stop);
 client.commands.set(reconnect.data.name, reconnect);
+client.commands.set(autoreconnect.data.name, autoreconnect);
 
 function startDiscordBot() {
 

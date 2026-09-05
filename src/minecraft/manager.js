@@ -84,11 +84,19 @@ function getBot() {
 function isConnected() {
     return bot !== null;
 }
+function setAutoReconnect(enabled) {
+    autoReconnect = enabled;
+}
 
+function isAutoReconnectEnabled() {
+    return autoReconnect;
+}
 module.exports = {
     connect,
     disconnect,
     reconnect,
     getBot,
-    isConnected
+    isConnected,
+    setAutoReconnect,
+    isAutoReconnectEnabled
 };
