@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { disconnect } = require("../../minecraft/manager");
+const { setMinecraftStatus } = require("../status");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -10,6 +11,10 @@ module.exports = {
 
         disconnect();
 
-        await interaction.reply("Bot has been stopped.");
+        setMinecraftStatus("idle", "Minecraft offline");
+
+        await interaction.reply(
+            "Bot is now offline."
+        );
     }
 };

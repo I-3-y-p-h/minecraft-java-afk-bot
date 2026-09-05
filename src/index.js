@@ -10,9 +10,21 @@ const {
     sendReconnectingMessage
 } = require("./discord/client");
 
+const {
+    setMinecraftStatus
+} = require("./discord/status");
+
 connect({
     onKicked: sendKickMessage,
-    onReconnecting: sendReconnectingMessage
+
+    onReconnecting: () => {
+        setMinecraftStatus("dnd", "Minecraft reconnecting...");
+        sendReconnectingMessage();
+    },
+
+    onSpawn: () => {
+        setMinecraftStatus("online", "Minecraft");
+    }
 });
 
 startDiscordBot();

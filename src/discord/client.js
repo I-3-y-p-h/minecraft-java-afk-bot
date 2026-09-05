@@ -3,7 +3,7 @@ const {
     GatewayIntentBits,
     Collection
 } = require("discord.js");
-
+const { setDiscordClient } = require("./status");
 const say = require("./commands/say");
 const stop = require("./commands/stop");
 const reconnect = require("./commands/reconnect");
@@ -24,6 +24,16 @@ function startDiscordBot() {
 
     client.once("ready", () => {
         console.log(`Discord-Bot logged in as ${client.user.tag}`);
+
+        client.user.setPresence({
+            status: "online",
+            activities: [
+                {
+                    name: "Minecraft",
+                    type: 0
+                }
+            ]
+        });
     });
 
     client.on("interactionCreate", async interaction => {
@@ -56,28 +66,6 @@ function startDiscordBot() {
     });
 
     client.login(process.env.DISCORD_TOKEN);
-}
-
-async function sendKickMessage(reason) {
-
-    try {
-
-        const channel = await client.channels.fetch(
-            process.env.DISCORD_CHANNEL_ID_KICKED
-        );
-
-        if (!channel) {
-            console.error("Kick channel not found.");
-            return;
-        }
-
-        await channel.send(
-            `Bot has been kicked: ${reason.value.text.value}`
-        );
-
-    } catch (error) {
-        console.error("Could not send kick message:", error);
-    }
 }
 async function sendKickMessage(reason) {
 
