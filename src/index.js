@@ -1,22 +1,7 @@
 require("dotenv").config();
-const {
-    createMinecraftBot
-} = require("./minecraft/client");
 
-const{
-    registerMinecraftEvents
-} = require("./minecraft/events");
+const { connect } = require("./minecraft/manager");
+const { startDiscordBot } = require("./discord/client");
 
-async function connectMinecraftBot() {
-    const minecraftBot = createMinecraftBot();
-    registerMinecraftEvents(minecraftBot);
-
-    minecraftBot.once("end", () =>{
-        console.log(`Connection closed. \nReconnecting in ${Number(process.env.RECONNECT_DELAY)} ms...`);
-        setTimeout(() =>{
-            connectMinecraftBot();
-        }, Number(process.env.RECONNECT_DELAY));
-    });
-}
-
-connectMinecraftBot();
+connect();
+startDiscordBot();
