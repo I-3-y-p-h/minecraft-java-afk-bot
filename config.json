@@ -1,0 +1,10 @@
+{
+  "startupDelayMs": 3000,
+  "switchTimeoutMs": 30000,
+  "homeCommandDelayMs": 3000,
+  "homeCommands": [
+    "/home <name>",
+    "/home <name>",
+    "/home <name>"
+  ]
+}
