@@ -1,0 +1,17 @@
+{
+  "startupDelayMs": 3000,
+  "switchTimeoutMs": 30000,
+  "homeCommandDelayMs": 3000,
+  "homeCommands": [
+    "/home <name>",
+    "/home <name>",
+    "/home <name>"
+  ],
+  "discord": {
+    "botToken": "<discord-bot-token>",
+    "clientId": "<discord-application-id>",
+    "guildId": "<discord-server-id>",
+    "kickedChannelId": "<discord-kicked-channel-id>",
+    "reconnectChannelId": "<discord-reconnect-channel-id>"
+  }
+}

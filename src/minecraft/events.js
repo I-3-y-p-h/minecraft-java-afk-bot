@@ -1,6 +1,6 @@
-const config = require("../../config.json");
+const { loadConfig } = require("../config");
 
-function registerMinecraftEvents(bot, callbacks = {}, settings = config) {
+function registerMinecraftEvents(bot, callbacks = {}, settings = loadConfig()) {
     let startupStarted = false;
     let disconnected = false;
 

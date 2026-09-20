@@ -1,4 +1,5 @@
-require("dotenv").config();
+const { getDiscordConfig } = require("./config");
+const discordConfig = getDiscordConfig();
 
 const { REST, Routes } = require("discord.js");
 
@@ -15,11 +16,11 @@ const commands = [
 ];
 
 const rest = new REST({ version: "10" }).setToken(
-    process.env.DISCORD_TOKEN
+    discordConfig.botToken
 );
 
-const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-const GUILD_ID = process.env.DISCORD_GUILD_ID;
+const CLIENT_ID = discordConfig.clientId;
+const GUILD_ID = discordConfig.guildId;
 
 async function deployCommands() {
     try {

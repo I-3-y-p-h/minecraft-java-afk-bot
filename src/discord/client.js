@@ -4,6 +4,8 @@ const {
     Collection
 } = require("discord.js");
 const { setDiscordClient } = require("./status");
+const { getDiscordConfig } = require("../config");
+const discordConfig = getDiscordConfig();
 const say = require("./commands/say");
 const stop = require("./commands/stop");
 const reconnect = require("./commands/reconnect");
@@ -67,14 +69,14 @@ function startDiscordBot() {
         }
     });
 
-    client.login(process.env.DISCORD_TOKEN);
+    client.login(discordConfig.botToken);
 }
 async function sendKickMessage(reason) {
 
     try {
 
         const channel = await client.channels.fetch(
-            process.env.DISCORD_CHANNEL_ID_KICKED
+            discordConfig.kickedChannelId
         );
 
         if (!channel) {
@@ -108,7 +110,7 @@ async function sendReconnectingMessage() {
     try {
 
         const channel = await client.channels.fetch(
-            process.env.DISCORD_CHANNEL_ID_RECONNECT
+            discordConfig.reconnectChannelId
         );
 
         if (!channel) {
