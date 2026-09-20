@@ -3,13 +3,6 @@ const assert = require("node:assert/strict");
 const EventEmitter = require("node:events");
 const { registerMinecraftEvents } = require("../src/minecraft/events");
 
-const previousServer = process.env.CB;
-process.env.CB = "test-server";
-test.after(() => {
-    if (previousServer === undefined) delete process.env.CB;
-    else process.env.CB = previousServer;
-});
-
 function createBot() {
     const bot = new EventEmitter();
     const sent = [];
@@ -27,6 +20,7 @@ async function waitFor(predicate, timeoutMs = 200) {
 }
 
 const settings = {
+    minecraft: { targetServer: "test-server" },
     startupDelayMs: 0,
     switchTimeoutMs: 500,
     homeCommandDelayMs: 0,

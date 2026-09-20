@@ -27,6 +27,7 @@ client.commands.set(autoreconnect.data.name, autoreconnect);
 function startDiscordBot() {
 
     client.once("ready", () => {
+        setDiscordClient(client);
         console.log(`Discord-Bot logged in as ${client.user.tag}`);
 
         client.user.setPresence({
@@ -69,7 +70,7 @@ function startDiscordBot() {
         }
     });
 
-    client.login(discordConfig.botToken);
+    return client.login(discordConfig.botToken);
 }
 async function sendKickMessage(reason) {
 

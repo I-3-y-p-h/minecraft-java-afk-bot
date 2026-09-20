@@ -29,8 +29,10 @@ function registerMinecraftEvents(bot, callbacks = {}, settings = loadConfig()) {
         await sleep(settings.startupDelayMs);
         if (disconnected || !bot.player) return;
 
-        const server = process.env.CB?.trim();
-        if (!server) throw new Error("CB is not configured.");
+        const server = settings.minecraft?.targetServer?.trim();
+        if (!server || /<[^>]+>/.test(server)) {
+            throw new Error("Set minecraft.targetServer in config.json.");
+        }
 
         await switchAndWaitForSpawn(bot, server, settings.switchTimeoutMs);
         if (disconnected || !bot.player) return;

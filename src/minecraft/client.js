@@ -1,17 +1,12 @@
 const mineflayer = require("mineflayer");
+const { getMinecraftConfig } = require("../config");
 
-function createMinecraftBot() {
-
-    console.log("HOST:", process.env.MC_HOST);
-    console.log("PORT:", process.env.MC_PORT);
-    console.log("USERNAME:", process.env.MC_USERNAME);
-
+function createMinecraftBot(minecraft = getMinecraftConfig()) {
     const bot = mineflayer.createBot({
-        host: process.env.MC_HOST,
-        port: Number(process.env.MC_PORT),
-        username: process.env.MC_USERNAME,
-        auth: "microsoft",
-        profilesFolder:"./auth"
+        host: minecraft.host,
+        port: minecraft.port,
+        username: minecraft.username,
+        auth: minecraft.auth
     });
 
     return bot;

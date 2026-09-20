@@ -1,4 +1,12 @@
 {
+  "minecraft": {
+    "host": "<minecraft-server-host>",
+    "port": 25565,
+    "username": "<microsoft-account-email>",
+    "auth": "microsoft",
+    "targetServer": "<server-after-switch>",
+    "reconnectDelayMs": 5000
+  },
   "startupDelayMs": 3000,
   "switchTimeoutMs": 30000,
   "homeCommandDelayMs": 3000,

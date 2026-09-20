@@ -1,5 +1,6 @@
 const { createMinecraftBot } = require("./client");
 const { registerMinecraftEvents } = require("./events");
+const { getMinecraftConfig } = require("../config");
 
 let bot = null;
 
@@ -37,7 +38,8 @@ function connect(callbacks = {}) {
             return;
         }
 
-        console.log("Reconnecting in 5 seconds...");
+        const delayMs = getMinecraftConfig().reconnectDelayMs;
+        console.log(`Reconnecting in ${delayMs / 1000} seconds...`);
 
         if (callbacks.onReconnecting) {
             callbacks.onReconnecting();
@@ -45,7 +47,7 @@ function connect(callbacks = {}) {
 
         setTimeout(() => {
             connect(callbacks);
-        }, Number(process.env.RECONNECT_DELAY) || 5000);
+        }, delayMs);
     });
 
     return bot;

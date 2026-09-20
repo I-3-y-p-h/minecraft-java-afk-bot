@@ -1,30 +1,31 @@
-require("dotenv").config();
+const { validateStartupConfig } = require("./config");
 
-const {
-    connect
-} = require("./minecraft/manager");
+async function main() {
+    validateStartupConfig();
 
-const {
-    startDiscordBot,
-    sendKickMessage,
-    sendReconnectingMessage
-} = require("./discord/client");
+    const { connect } = require("./minecraft/manager");
+    const {
+        startDiscordBot,
+        sendKickMessage,
+        sendReconnectingMessage
+    } = require("./discord/client");
+    const { setMinecraftStatus } = require("./discord/status");
 
-const {
-    setMinecraftStatus
-} = require("./discord/status");
+    await startDiscordBot();
 
-connect({
-    onKicked: sendKickMessage,
+    connect({
+        onKicked: sendKickMessage,
+        onReconnecting: () => {
+            setMinecraftStatus("dnd", "Minecraft reconnecting...");
+            sendReconnectingMessage();
+        },
+        onSpawn: () => {
+            setMinecraftStatus("online", "Minecraft");
+        }
+    });
+}
 
-    onReconnecting: () => {
-        setMinecraftStatus("dnd", "Minecraft reconnecting...");
-        sendReconnectingMessage();
-    },
-
-    onSpawn: () => {
-        setMinecraftStatus("online", "Minecraft");
-    }
+main().catch(error => {
+    console.error("Startup failed:", error.message);
+    process.exit(1);
 });
-
-startDiscordBot();
