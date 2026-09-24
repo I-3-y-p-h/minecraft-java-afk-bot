@@ -5,6 +5,7 @@ const {
 } = require("discord.js");
 const { setDiscordClient } = require("./status");
 const { getDiscordConfig } = require("../config");
+const { log } = require("../logger");
 const discordConfig = getDiscordConfig();
 const say = require("./commands/say");
 const stop = require("./commands/stop");
@@ -28,7 +29,7 @@ function startDiscordBot() {
 
     client.once("ready", () => {
         setDiscordClient(client);
-        console.log(`Discord-Bot logged in as ${client.user.tag}`);
+        log.success(`Discord-Bot ist als ${client.user.tag} verbunden.`);
 
         client.user.setPresence({
             status: "online",
@@ -56,7 +57,7 @@ function startDiscordBot() {
         try {
             await command.execute(interaction);
         } catch (error) {
-            console.error(error);
+            log.error(`Discord-Befehl fehlgeschlagen: ${error.message}`);
 
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp(
@@ -81,7 +82,7 @@ async function sendKickMessage(reason) {
         );
 
         if (!channel) {
-            console.error("Kick channel not found.");
+            log.error("Der Discord-Kick-Kanal wurde nicht gefunden.");
             return;
         }
 
@@ -101,7 +102,7 @@ async function sendKickMessage(reason) {
         );
 
     } catch (error) {
-        console.error("Could not send kick message:", error);
+        log.error(`Kick-Nachricht konnte nicht gesendet werden: ${error.message}`);
     }
 }
 
@@ -115,7 +116,7 @@ async function sendReconnectingMessage() {
         );
 
         if (!channel) {
-            console.error("Reconnect channel not found.");
+            log.error("Der Discord-Reconnect-Kanal wurde nicht gefunden.");
             return;
         }
 
@@ -124,7 +125,7 @@ async function sendReconnectingMessage() {
         );
 
     } catch (error) {
-        console.error("Could not send reconnect message:", error);
+        log.error(`Reconnect-Nachricht konnte nicht gesendet werden: ${error.message}`);
     }
 }
 

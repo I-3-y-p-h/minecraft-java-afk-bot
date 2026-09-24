@@ -6,7 +6,9 @@ function createMinecraftBot(minecraft = getMinecraftConfig()) {
         host: minecraft.host,
         port: minecraft.port,
         username: minecraft.username,
-        auth: minecraft.auth
+        auth: minecraft.auth,
+        version: minecraft.version,
+        profilesFolder: minecraft.profilesFolder
     });
 
     return bot;

@@ -1,4 +1,5 @@
 let discordClient = null;
+const { log } = require("../logger");
 
 function setDiscordClient(client) {
     discordClient = client;
@@ -7,11 +8,11 @@ function setDiscordClient(client) {
 function setMinecraftStatus(status, text) {
 
     if (!discordClient || !discordClient.isReady()) {
-        console.log("Discord client is not ready.");
+        log.wait("Der Discord-Bot ist noch nicht bereit für eine Statusänderung.");
         return;
     }
 
-    console.log(`Setting Discord status: ${status} - ${text}`);
+    log.info(`Discord-Status: ${status} – ${text}`);
 
     discordClient.user.setPresence({
         status: status,

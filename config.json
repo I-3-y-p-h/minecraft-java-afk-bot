@@ -1,21 +1,33 @@
 {
-  "minecraft": {
-    "host": "<minecraft-server-host>",
+  "bot": {
+    "host": "GrieferGames.net",
     "port": 25565,
     "username": "<microsoft-account-email>",
     "auth": "microsoft",
-    "targetServer": "<server-after-switch>",
-    "reconnectDelayMs": 5000
+    "version": "1.8.9",
+    "profilesFolder": "./profiles"
   },
-  "startupDelayMs": 3000,
-  "switchTimeoutMs": 30000,
-  "homeCommandDelayMs": 3000,
-  "homeCommands": [
-    "/home <name>",
-    "/home <name>",
-    "/home <name>"
-  ],
+  "startup": {
+    "switchAfterJoinMs": 5000,
+    "switchCommandDelayMs": 1000,
+    "switchCommands": [
+      "/switch <citybuild>"
+    ],
+    "dataLoadedMessage": "[GrieferGames] Deine Daten wurden vollständig heruntergeladen.",
+    "homeAfterDataLoadedMs": 2000,
+    "homeCommandDelayMs": 1000,
+    "homeCommands": [
+      "/home <name>",
+      "/home <name>",
+      "/home <name>"
+    ]
+  },
+  "reconnect": {
+    "enabled": true,
+    "delayMs": 10000
+  },
   "discord": {
+    "enabled": true,
     "botToken": "<discord-bot-token>",
     "clientId": "<discord-application-id>",
     "guildId": "<discord-server-id>",

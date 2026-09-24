@@ -1,31 +1,43 @@
 const { validateStartupConfig } = require("./config");
+const { log } = require("./logger");
 
 async function main() {
-    validateStartupConfig();
+    const settings = validateStartupConfig();
+    log.info("Mineflayer-Bot wird gestartet.");
 
     const { connect } = require("./minecraft/manager");
-    const {
-        startDiscordBot,
-        sendKickMessage,
-        sendReconnectingMessage
-    } = require("./discord/client");
-    const { setMinecraftStatus } = require("./discord/status");
+    let callbacks = {};
 
-    await startDiscordBot();
+    if (settings.discord.enabled) {
+        const {
+            startDiscordBot,
+            sendKickMessage,
+            sendReconnectingMessage
+        } = require("./discord/client");
+        const { setMinecraftStatus } = require("./discord/status");
 
-    connect({
-        onKicked: sendKickMessage,
-        onReconnecting: () => {
-            setMinecraftStatus("dnd", "Minecraft reconnecting...");
-            sendReconnectingMessage();
-        },
-        onSpawn: () => {
-            setMinecraftStatus("online", "Minecraft");
-        }
-    });
+        callbacks = {
+            onKicked: sendKickMessage,
+            onReconnecting: () => {
+                setMinecraftStatus("dnd", "Minecraft reconnecting...");
+                sendReconnectingMessage();
+            },
+            onSpawn: () => {
+                setMinecraftStatus("online", "Minecraft");
+            }
+        };
+
+        startDiscordBot().catch(error => {
+            log.error(`Discord-Bot konnte nicht gestartet werden: ${error.message}`);
+        });
+    } else {
+        log.info("Discord-Bot ist in config.json deaktiviert.");
+    }
+
+    connect(callbacks);
 }
 
 main().catch(error => {
-    console.error("Startup failed:", error.message);
+    log.error(`Start fehlgeschlagen: ${error.message}`);
     process.exit(1);
 });

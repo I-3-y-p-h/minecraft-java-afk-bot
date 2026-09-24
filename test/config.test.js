@@ -8,19 +8,29 @@ const {
 } = require("../src/config");
 
 const configured = {
-    minecraft: {
+    bot: {
         host: "play.example.com",
         port: 25565,
         username: "player@example.com",
         auth: "microsoft",
-        targetServer: "afk",
-        reconnectDelayMs: 5000
+        version: "1.8.9",
+        profilesFolder: "./profiles"
     },
-    startupDelayMs: 0,
-    switchTimeoutMs: 1000,
-    homeCommandDelayMs: 0,
-    homeCommands: ["/home one", "/home two", "/home three"],
+    startup: {
+        switchAfterJoinMs: 0,
+        switchCommandDelayMs: 0,
+        switchCommands: ["/switch cb21"],
+        dataLoadedMessage: "data ready",
+        homeAfterDataLoadedMs: 0,
+        homeCommandDelayMs: 0,
+        homeCommands: ["/home one", "/home two", "/home three"]
+    },
+    reconnect: {
+        enabled: true,
+        delayMs: 5000
+    },
     discord: {
+        enabled: true,
         botToken: "test-token",
         clientId: "123",
         guildId: "456",
@@ -30,24 +40,34 @@ const configured = {
 };
 
 test("accepts Minecraft settings and a complete startup config", () => {
-    assert.deepEqual(getMinecraftConfig(configured), configured.minecraft);
+    assert.deepEqual(getMinecraftConfig(configured), configured.bot);
     assert.equal(validateStartupConfig(configured), configured);
 });
 
-test("reports missing Minecraft account and switch server", () => {
+test("reports a missing Minecraft account", () => {
     assert.throws(
-        () => getMinecraftConfig({ minecraft: { ...configured.minecraft, username: "<microsoft-account-email>", targetServer: "<server-after-switch>" } }),
-        /minecraft\.username, minecraft\.targetServer/
+        () => getMinecraftConfig({ bot: { ...configured.bot, username: "<microsoft-account-email>" } }),
+        /bot\.username/
     );
 });
 
 test("reports all placeholder groups before connecting", () => {
     assert.throws(
         () => validateStartupConfig(loadConfig()),
-        error => /minecraft\.host/.test(error.message) &&
+        error => /bot\.username/.test(error.message) &&
             /discord\.botToken/.test(error.message) &&
+            /switchCommands/.test(error.message) &&
             /homeCommands/.test(error.message)
     );
+});
+
+test("allows Discord to be disabled without credentials", () => {
+    const settings = {
+        ...configured,
+        discord: { enabled: false }
+    };
+    assert.deepEqual(getDiscordConfig(settings), settings.discord);
+    assert.equal(validateStartupConfig(settings), settings);
 });
 
 test("accepts the Discord settings from config", () => {

@@ -1,9 +1,9 @@
 {
   "name": "minecraft-java-afk-bot",
   "version": "1.0.0",
-  "main": "src/index.js",
+  "main": "bot.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node bot.js",
     "deploy": "node src/deploy-commands.js",
     "test": "node --test"
   },
@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "chalk": "^4.1.2",
     "discord.js": "^14.27.0",
     "mineflayer": "^4.37.1"
   }

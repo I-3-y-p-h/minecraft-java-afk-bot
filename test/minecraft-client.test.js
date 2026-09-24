@@ -16,13 +16,17 @@ test("passes the configured account and server to Mineflayer", () => {
             host: "play.example.com",
             port: 25565,
             username: "player@example.com",
-            auth: "microsoft"
+            auth: "microsoft",
+            version: "1.8.9",
+            profilesFolder: "./profiles"
         }), { connected: true });
         assert.deepEqual(options, {
             host: "play.example.com",
             port: 25565,
             username: "player@example.com",
-            auth: "microsoft"
+            auth: "microsoft",
+            version: "1.8.9",
+            profilesFolder: "./profiles"
         });
     } finally {
         mineflayer.createBot = originalCreateBot;

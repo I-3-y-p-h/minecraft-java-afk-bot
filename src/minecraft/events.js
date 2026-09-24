@@ -1,101 +1,104 @@
 const { loadConfig } = require("../config");
+const { log } = require("../logger");
 
 function registerMinecraftEvents(bot, callbacks = {}, settings = loadConfig()) {
-    let startupStarted = false;
+    const startup = settings.startup;
     let disconnected = false;
+    let spawnHandled = false;
+    let switchCommandsSent = false;
+    let homeSequenceStarted = false;
 
-    bot.on("end", () => {
+    bot.on("end", reason => {
         disconnected = true;
+        const detail = toPlainText(reason);
+        log.error(detail ? `Minecraft-Verbindung getrennt: ${detail}` : "Minecraft-Verbindung getrennt.");
     });
 
     bot.on("login", () => {
-        console.log("Login");
+        log.success(`Bot ist als ${bot.username || "Minecraft-Spieler"} verbunden.`);
         if (callbacks.onLogin) callbacks.onLogin();
     });
 
     bot.on("spawn", () => {
-        console.log("Bot spawned!");
         if (callbacks.onSpawn) callbacks.onSpawn();
+        if (spawnHandled) return;
+        spawnHandled = true;
 
-        if (startupStarted) return;
-        startupStarted = true;
-
-        runStartup().catch(error => {
-            console.error("Minecraft startup failed:", error.message);
+        sendSwitchCommands().catch(error => {
+            log.error(`Startablauf fehlgeschlagen: ${error.message}`);
         });
     });
 
-    async function runStartup() {
-        await sleep(settings.startupDelayMs);
-        if (disconnected || !bot.player) return;
+    bot.on("messagestr", message => {
+        const plainMessage = toPlainText(message);
+        if (!plainMessage || !switchCommandsSent || homeSequenceStarted) return;
+        if (!plainMessage.includes(startup.dataLoadedMessage)) return;
 
-        const server = settings.minecraft?.targetServer?.trim();
-        if (!server || /<[^>]+>/.test(server)) {
-            throw new Error("Set minecraft.targetServer in config.json.");
-        }
-
-        await switchAndWaitForSpawn(bot, server, settings.switchTimeoutMs);
-        if (disconnected || !bot.player) return;
-
-        const commands = settings.homeCommands;
-        if (!Array.isArray(commands) || commands.length !== 3 ||
-            commands.some(command => typeof command !== "string" || !command.startsWith("/") || /<[^>]+>/.test(command))) {
-            throw new Error("Set three complete homeCommands in config.json before starting the bot.");
-        }
-
-        for (const [index, command] of commands.entries()) {
-            if (disconnected || !bot.player) return;
-            bot.chat(command);
-            if (index < commands.length - 1) {
-                await sleep(settings.homeCommandDelayMs);
-            }
-        }
-    }
-
-    bot.on("chat", (username, message) => {
-        console.log(`[${username}] ${message}`);
+        homeSequenceStarted = true;
+        sendHomeCommands().catch(error => {
+            log.error(`Home-Ablauf fehlgeschlagen: ${error.message}`);
+        });
     });
 
     bot.on("kicked", reason => {
-        console.log("Bot has been kicked:", reason);
+        const detail = toPlainText(reason) || "Unbekannter Grund";
+        log.error(`Bot wurde gekickt: ${detail}`);
         if (callbacks.onKicked) callbacks.onKicked(reason);
     });
 
     bot.on("error", error => {
-        console.error("Minecraft-Error:", error);
+        log.error(`Minecraft-Fehler: ${error.message}`);
     });
+
+    async function sendSwitchCommands() {
+        log.wait(`Warte ${formatSeconds(startup.switchAfterJoinMs)} Sekunden vor dem Serverwechsel.`);
+        await sleep(startup.switchAfterJoinMs);
+        if (disconnected) return;
+
+        for (const [index, command] of startup.switchCommands.entries()) {
+            if (disconnected) return;
+            bot.chat(command);
+            log.command(`${command} wurde gesendet.`);
+            if (index < startup.switchCommands.length - 1) {
+                await sleep(startup.switchCommandDelayMs);
+            }
+        }
+        switchCommandsSent = true;
+        log.wait("Warte auf die vollständige Datenmeldung von GrieferGames.");
+    }
+
+    async function sendHomeCommands() {
+        log.success("Die Spielerdaten wurden vollständig heruntergeladen.");
+        log.wait(`Warte ${formatSeconds(startup.homeAfterDataLoadedMs)} Sekunden vor dem Home-Teleport.`);
+        await sleep(startup.homeAfterDataLoadedMs);
+        if (disconnected) return;
+
+        for (const [index, command] of startup.homeCommands.entries()) {
+            if (disconnected) return;
+            bot.chat(command);
+            log.command(`${command} wurde gesendet.`);
+            if (index < startup.homeCommands.length - 1) {
+                await sleep(startup.homeCommandDelayMs);
+            }
+        }
+        log.success("Startablauf vollständig abgeschlossen.");
+        if (callbacks.onStartupComplete) callbacks.onStartupComplete();
+    }
 }
 
-function switchAndWaitForSpawn(bot, server, timeoutMs) {
-    return new Promise((resolve, reject) => {
-        let timer;
-        const cleanup = () => {
-            clearTimeout(timer);
-            bot.removeListener("spawn", onSpawn);
-            bot.removeListener("end", onEnd);
-        };
-        const onSpawn = () => {
-            cleanup();
-            resolve();
-        };
-        const onEnd = () => {
-            cleanup();
-            reject(new Error("Disconnected while switching servers."));
-        };
+function toPlainText(value) {
+    if (value === undefined || value === null) return "";
+    let text;
+    if (typeof value === "string") text = value;
+    else if (typeof value.toString === "function") text = value.toString();
+    else text = JSON.stringify(value);
+    return text.replace(/§[0-9A-FK-OR]/gi, "").trim();
+}
 
-        bot.once("spawn", onSpawn);
-        bot.once("end", onEnd);
-        timer = setTimeout(() => {
-            cleanup();
-            reject(new Error("No spawn event after /switch; home commands were not sent."));
-        }, timeoutMs);
-
-        try {
-            bot.chat(`/switch ${server}`);
-        } catch (error) {
-            cleanup();
-            reject(error);
-        }
+function formatSeconds(milliseconds) {
+    return (milliseconds / 1000).toLocaleString("de-DE", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
     });
 }
 
@@ -103,4 +106,4 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-module.exports = { registerMinecraftEvents };
+module.exports = { registerMinecraftEvents, toPlainText };
